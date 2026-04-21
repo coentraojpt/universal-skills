@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/coentraojpt/universal-skills/schema/skill.schema.json",
+  "title": "USF Skill",
+  "description": "Frontmatter schema for a Universal Skills Framework (USF) skill file.",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Skill identifier. kebab-case. Max 64 chars for compat with Claude Agent Skills.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "description": {
+      "type": "string",
+      "description": "One-line skill description. Max 1024 chars for compat with Claude Agent Skills.",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (semver).",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "author": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "recommended_temperature": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2
+    },
+    "max_tokens": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200000
+    },
+    "model_hints": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "properties": {
+        "openai": { "type": "string" },
+        "anthropic": { "type": "string" },
+        "gemini": { "type": "string" },
+        "ollama": { "type": "string" }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["string", "number", "boolean"],
+            "default": "string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "default": {},
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "wikilink_mode": {
+      "type": "string",
+      "enum": ["truncate", "summary", "full"],
+      "default": "truncate",
+      "description": "How [[wikilinks]] are resolved when this skill is loaded from an Obsidian vault."
+    },
+    "wikilink_token_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1000,
+      "description": "Per-link token cap when wikilink_mode is 'truncate'."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short summary injected instead of full body when referenced by [[wikilink]] in summary mode."
+    },
+    "usf": {
+      "type": "boolean",
+      "description": "Set to false to exclude this note from USF loading (opt-out)."
+    }
+  }
+}
