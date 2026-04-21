@@ -1,0 +1,42 @@
+{
+  "code-reviewer": {
+    "code": "def add(a, b):\n    return a + b",
+    "language": "python"
+  },
+  "api-designer": {
+    "feature": "A public API for managing short URLs with analytics.",
+    "style": "REST"
+  },
+  "debug-assistant": {
+    "error": "TypeError: Cannot read properties of undefined (reading 'map')\n    at Users.render (app.js:42)",
+    "code": "const names = props.users.map(u => u.name);",
+    "language": "javascript"
+  },
+  "technical-writer": {
+    "source": "we added a new /webhooks endpoint. it posts events on order.created. retry is 3 times with exponential backoff. signed with HMAC sha256.",
+    "audience": "developers"
+  },
+  "startup-validator": {
+    "pitch": "A subscription service that ships a curated box of ingredients plus a 15-minute recipe to time-starved professionals who want to cook at home."
+  },
+  "commit-message-writer": {
+    "diff": "diff --git a/src/auth.ts b/src/auth.ts\n@@\n-function verify(token) {\n+function verify(token, opts = {}) {\n   if (!token) return false;\n+  if (opts.allowExpired && isExpired(token)) return true;\n   return validate(token);\n }",
+    "scope": "auth"
+  },
+  "sql-optimizer": {
+    "query": "SELECT u.name, COUNT(o.id) FROM users u LEFT JOIN orders o ON o.user_id = u.id WHERE u.created_at > NOW() - INTERVAL '30 days' GROUP BY u.name ORDER BY COUNT(o.id) DESC;",
+    "engine": "postgres",
+    "plan": "",
+    "schema": "CREATE INDEX users_created_at_idx ON users(created_at);"
+  },
+  "security-auditor": {
+    "code": "app.get('/user', (req, res) => {\n  const id = req.query.id;\n  db.query(`SELECT * FROM users WHERE id = ${id}`, (err, rows) => res.send(rows));\n});",
+    "language": "javascript",
+    "context": "public Express endpoint"
+  },
+  "refactorer": {
+    "code": "def p(l):\n  r = []\n  for i in range(len(l)):\n    if l[i] % 2 == 0:\n      r.append(l[i] * 2)\n  return r",
+    "language": "python",
+    "priorities": "readability,simplicity"
+  }
+}

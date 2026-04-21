@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Node / TypeScript
+node_modules/
+*.tsbuildinfo
+.pnpm-store/
+packages/*/dist/
+packages/*/lib/
+
+# Obsidian plugin build output (distributed via GitHub Releases, not source)
+packages/obsidian-plugin/main.js
+packages/obsidian-plugin/main.js.map
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Parity build artifacts
+build/py/
+build/ts/
+
+# skill sync output (generated — do NOT commit to the skills repo itself)
+.cursor/
+.github/instructions/
+.trae/
+.opencode/
+opencode.json
+.usf.json
+
+# Build tools
+.vite/
+
+# Obsidian
+.obsidian/workspace*
+.obsidian/appearance.json
+.trash/
+.claude
