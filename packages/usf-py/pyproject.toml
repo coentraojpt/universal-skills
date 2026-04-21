@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "usf-skills"
+version = "0.1.1"
+description = "One skills folder, every AI coding tool. Write prompts once, sync to Cursor, VS Code, Claude Code and more."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Universal Skills Framework contributors" }]
+keywords = ["llm", "prompt", "skills", "openai", "anthropic", "gemini", "ollama", "obsidian"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "click>=8.1",
+    "pyyaml>=6.0",
+    "jsonschema>=4.17,<4.18",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=1.40"]
+anthropic = ["anthropic>=0.40"]
+gemini = ["google-genai>=0.3"]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+skill = "usf.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/coentraojpt/universal-skills"
+Documentation = "https://github.com/coentraojpt/universal-skills#readme"
+Repository = "https://github.com/coentraojpt/universal-skills"
+Issues = "https://github.com/coentraojpt/universal-skills/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["usf"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
