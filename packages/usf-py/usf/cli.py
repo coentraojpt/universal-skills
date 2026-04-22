@@ -12,6 +12,7 @@ import click
 
 from . import __version__
 from .adapters import available_providers
+from .exporters import EXPORTERS, GLOBAL_DEFAULTS, PROJECT_OUT_DIRS
 from .loader import Skill, load, load_dir
 from .obsidian import load_vault
 from .validate import validate_path, validate_skill
@@ -152,7 +153,7 @@ def diff_cmd(name: str, providers: tuple[str, ...], inputs: tuple[str, ...],
 @click.argument("name")
 @click.option(
     "--format", "fmt",
-    type=click.Choice(list(__import__("usf.exporters", fromlist=["EXPORTERS"]).EXPORTERS)),
+    type=click.Choice(list(EXPORTERS)),
     default="claude",
     help="Target tool format.",
 )
@@ -165,7 +166,6 @@ def export_cmd(name: str, fmt: str, export_all: bool, out: str | None, path: str
     Formats: claude, antigravity, verdent, cursor, vscode, opencode, trae.
     Use --all to export to every format at once.
     """
-    from .exporters import EXPORTERS, GLOBAL_DEFAULTS
     skill = _find(name, path)
     targets = list(EXPORTERS.keys()) if export_all else [fmt]
     for target_fmt in targets:
@@ -213,8 +213,6 @@ def init_cmd(skills_dir: str | None, formats: str | None, team_url: str | None, 
     Links this project to your skills folder so `skill sync` keeps all
     AI coding tools up to date whenever skills change.
     """
-    from .exporters import EXPORTERS
-
     config_path = Path(USF_CONFIG)
 
     if skills_dir is None:
@@ -348,8 +346,6 @@ def _sync_team(team_url: str, formats: list, project_dir: Path, use_global: bool
 
 
 def _do_sync(config: dict, project_dir: Path, use_global: bool = False) -> None:
-    from .exporters import EXPORTERS, GLOBAL_DEFAULTS, PROJECT_OUT_DIRS
-
     skills_path = Path(config["skills"]).expanduser().resolve()
     formats: list[str] = config.get("formats", [])
     skills = load_dir(str(skills_path))
