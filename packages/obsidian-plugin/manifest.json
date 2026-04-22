@@ -1,7 +1,7 @@
 {
   "id": "universal-skills",
   "name": "Universal Skills (USF)",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "minAppVersion": "1.4.0",
   "description": "Run and validate Universal LLM Skills Framework (USF) skills from your Obsidian vault.",
   "author": "USF contributors",
