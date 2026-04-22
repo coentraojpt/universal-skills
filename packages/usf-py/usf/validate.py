@@ -25,14 +25,10 @@ class ValidationError(Exception):
 _SCHEMA_CACHE: dict | None = None
 
 
-def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[3]
-
-
 def get_schema() -> dict:
     global _SCHEMA_CACHE
     if _SCHEMA_CACHE is None:
-        schema_path = _repo_root() / "schema" / "skill.schema.json"
+        schema_path = Path(__file__).parent / "skill.schema.json"
         _SCHEMA_CACHE = json.loads(schema_path.read_text(encoding="utf-8"))
     return _SCHEMA_CACHE
 

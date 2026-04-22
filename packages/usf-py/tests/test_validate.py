@@ -3,9 +3,19 @@ from pathlib import Path
 import pytest
 
 from usf.loader import load
-from usf.validate import validate_path, validate_skill
+from usf.validate import validate_path, validate_skill, get_schema
 
 REPO = Path(__file__).resolve().parents[3]
+
+
+def test_schema_bundled_with_package():
+    """skill.schema.json must be resolvable from the installed package, not the repo root."""
+    import usf.validate as _v
+    schema_path = Path(_v.__file__).parent / "skill.schema.json"
+    assert schema_path.exists(), f"schema not found at {schema_path} — not bundled in wheel"
+    schema = get_schema()
+    assert isinstance(schema, dict)
+    assert "properties" in schema
 
 
 def test_all_skills_valid():

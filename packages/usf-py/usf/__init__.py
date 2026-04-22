@@ -6,7 +6,7 @@ from .prompt import CompiledPrompt, build_prompt
 from .validate import validate_skill, ValidationError
 from .obsidian import Vault, load_vault, resolve_wikilinks
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 __all__ = [
     "Skill",
