@@ -4,6 +4,7 @@ from __future__ import annotations
 import difflib
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -182,6 +183,8 @@ USF_GLOBAL_CONFIG = Path.home() / ".usf.json"  # machine-wide: remembers skills 
 PROJECT_FORMATS = ("cursor", "vscode", "opencode", "trae", "windsurf", "roo", "claude", "antigravity", "verdent")
 GLOBAL_ONLY_FORMATS: tuple[()] = ()  # all formats now support project-level
 GLOBAL_FORMATS = PROJECT_FORMATS
+# Formats that use the SKILL.md directory structure and need _memory/ copied alongside skills
+_MEMORY_AWARE_FORMATS = frozenset({"claude", "antigravity", "verdent"})
 
 
 def _load_global_config() -> dict:
@@ -354,6 +357,9 @@ def _do_sync(config: dict, project_dir: Path, use_global: bool = False) -> None:
         click.echo("no skills found — nothing to sync")
         return
 
+    memory_src = skills_path / "_memory"
+    synced_memory_dirs: set[Path] = set()
+
     for fmt in formats:
         if fmt not in EXPORTERS:
             click.echo(click.style(f"warning: unknown format '{fmt}', skipping", fg="yellow"), err=True)
@@ -370,6 +376,14 @@ def _do_sync(config: dict, project_dir: Path, use_global: bool = False) -> None:
             count += 1
         label = str(out_dir).replace(str(Path.home()), "~")
         click.echo(click.style(f"synced {count} skills", fg="green") + f" -> {fmt}  ({label})")
+
+        if fmt in _MEMORY_AWARE_FORMATS and memory_src.is_dir() and out_dir not in synced_memory_dirs:
+            memory_dst = out_dir / "_memory"
+            if memory_dst.exists():
+                shutil.rmtree(memory_dst)
+            shutil.copytree(memory_src, memory_dst)
+            synced_memory_dirs.add(out_dir)
+            click.echo(f"  copied _memory/ -> {label}/_memory")
 
 
 def _detect_skills_dir() -> Path | None:
