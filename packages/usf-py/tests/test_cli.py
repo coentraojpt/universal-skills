@@ -131,6 +131,36 @@ def test_export_trae_format(tmp_path):
     assert "# Role" in md.read_text(encoding="utf-8")
 
 
+def test_export_windsurf_format(tmp_path):
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        ["export", "code-reviewer", "--format", "windsurf",
+         "--out", str(tmp_path), "--path", str(REPO / "skills")],
+    )
+    assert result.exit_code == 0, result.output
+    md = tmp_path / ".windsurf" / "rules" / "code-reviewer.md"
+    assert md.exists()
+    content = md.read_text(encoding="utf-8")
+    assert "trigger: manual" in content
+    assert "description:" in content
+    assert "# Role" in content
+
+
+def test_export_roo_format(tmp_path):
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        ["export", "code-reviewer", "--format", "roo",
+         "--out", str(tmp_path), "--path", str(REPO / "skills")],
+    )
+    assert result.exit_code == 0, result.output
+    # code-reviewer has no mode tag → falls back to rules/
+    md = tmp_path / ".roo" / "rules" / "code-reviewer.md"
+    assert md.exists()
+    assert "# Role" in md.read_text(encoding="utf-8")
+
+
 def test_export_all_flag(tmp_path):
     runner = CliRunner()
     result = runner.invoke(
@@ -144,6 +174,24 @@ def test_export_all_flag(tmp_path):
     assert (tmp_path / ".github" / "instructions" / "code-reviewer.instructions.md").exists()
     assert (tmp_path / ".opencode" / "code-reviewer.md").exists()
     assert (tmp_path / ".trae" / "rules" / "code-reviewer.md").exists()
+    assert (tmp_path / ".windsurf" / "rules" / "code-reviewer.md").exists()
+    assert (tmp_path / ".roo" / "rules" / "code-reviewer.md").exists()
+
+
+def test_sync_claude_project_level(tmp_path):
+    """claude format must write inside the project, not to ~/.claude/skills."""
+    import json as _json
+    config = {
+        "skills": str(REPO / "skills"),
+        "formats": ["claude"],
+    }
+    (tmp_path / ".usf.json").write_text(_json.dumps(config), encoding="utf-8")
+    runner = CliRunner()
+    result = runner.invoke(main, ["sync", "--project", str(tmp_path)],
+                           env={"USERPROFILE": str(tmp_path), "HOME": str(tmp_path)})
+    assert result.exit_code == 0, result.output
+    skill_md = tmp_path / ".claude" / "skills" / "code-reviewer" / "SKILL.md"
+    assert skill_md.exists(), "expected project-level .claude/skills/, not global"
 
 
 def test_init_creates_config_and_syncs(tmp_path):

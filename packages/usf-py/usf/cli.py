@@ -179,9 +179,9 @@ def export_cmd(name: str, fmt: str, export_all: bool, out: str | None, path: str
 
 USF_CONFIG = ".usf.json"
 USF_GLOBAL_CONFIG = Path.home() / ".usf.json"  # machine-wide: remembers skills path
-PROJECT_FORMATS = ("cursor", "vscode", "opencode", "trae")
-GLOBAL_ONLY_FORMATS = ("claude", "antigravity", "verdent")  # no project equivalent
-GLOBAL_FORMATS = GLOBAL_ONLY_FORMATS + PROJECT_FORMATS      # all formats with a global path
+PROJECT_FORMATS = ("cursor", "vscode", "opencode", "trae", "windsurf", "roo", "claude", "antigravity", "verdent")
+GLOBAL_ONLY_FORMATS: tuple[()] = ()  # all formats now support project-level
+GLOBAL_FORMATS = PROJECT_FORMATS
 
 
 def _load_global_config() -> dict:
@@ -348,7 +348,7 @@ def _sync_team(team_url: str, formats: list, project_dir: Path, use_global: bool
 
 
 def _do_sync(config: dict, project_dir: Path, use_global: bool = False) -> None:
-    from .exporters import EXPORTERS, GLOBAL_DEFAULTS
+    from .exporters import EXPORTERS, GLOBAL_DEFAULTS, PROJECT_OUT_DIRS
 
     skills_path = Path(config["skills"]).expanduser().resolve()
     formats: list[str] = config.get("formats", [])
@@ -362,8 +362,10 @@ def _do_sync(config: dict, project_dir: Path, use_global: bool = False) -> None:
         if fmt not in EXPORTERS:
             click.echo(click.style(f"warning: unknown format '{fmt}', skipping", fg="yellow"), err=True)
             continue
-        if fmt in GLOBAL_ONLY_FORMATS or (use_global and fmt in GLOBAL_DEFAULTS):
+        if use_global and fmt in GLOBAL_DEFAULTS:
             out_dir = GLOBAL_DEFAULTS[fmt]
+        elif fmt in PROJECT_OUT_DIRS:
+            out_dir = project_dir / PROJECT_OUT_DIRS[fmt]
         else:
             out_dir = project_dir
         count = 0

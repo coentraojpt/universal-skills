@@ -22,6 +22,10 @@
   &nbsp;
   <img src="https://img.shields.io/badge/Cursor-supported-000000?logoColor=white" alt="Cursor" height="28">
   &nbsp;
+  <img src="https://img.shields.io/badge/Windsurf-supported-00B4D8?logoColor=white" alt="Windsurf" height="28">
+  &nbsp;
+  <img src="https://img.shields.io/badge/Roo_Code-supported-6D28D9?logoColor=white" alt="Roo Code" height="28">
+  &nbsp;
   <img src="https://img.shields.io/badge/Ollama-offline-4B5563" alt="Ollama" height="28">
   &nbsp;
   <img src="https://img.shields.io/badge/VS_Code-supported-007ACC?logo=visualstudiocode&logoColor=white" alt="VS Code" height="28">
@@ -39,7 +43,7 @@ USF is an open markdown+YAML standard for LLM "skills" with three pillars:
 |---|---|---|
 | `[[wikilinks]]` in **Obsidian** inject persistent context into every prompt | Write once, version in git, validate in CI | Claude, OpenAI, Gemini, Ollama — same `.md` file |
 
-Write a skill once — run it in **Claude Code**, **Cursor**, **VS Code**, **TRAE**, **Antigravity**, **OpenCode**, or any **Ollama** model without duplicating a single prompt. The `skills/` folder is a live **Obsidian vault**: browse your library visually, edit memory notes, and run skills without leaving your editor.
+Write a skill once — run it in **Claude Code**, **Cursor**, **Windsurf**, **Roo Code**, **VS Code**, **TRAE**, **Antigravity**, **OpenCode**, or any **Ollama** model without duplicating a single prompt. The `skills/` folder is a live **Obsidian vault**: browse your library visually, edit memory notes, and run skills without leaving your editor.
 
 ---
 
@@ -56,15 +60,18 @@ flowchart LR
 
     VAULT -->|"skill sync"| SYNC{{"⚙️  skill sync"}}
 
-    SYNC -->|"--global"| G1["🤖  Claude Code"]
-    SYNC -->|"--global"| G2["🤖  Antigravity"]
-    SYNC -->|"--global"| G3["🤖  Verdent"]
     SYNC -->|"per project"| P1["✏️  Cursor"]
     SYNC -->|"per project"| P2["✏️  VS Code Copilot"]
-    SYNC -->|"per project"| P3["✏️  TRAE / OpenCode"]
+    SYNC -->|"per project"| P3["✏️  Windsurf"]
+    SYNC -->|"per project"| P4["✏️  Roo Code"]
+    SYNC -->|"per project"| P5["✏️  TRAE / OpenCode"]
+    SYNC -->|"per project"| P6["🤖  Claude Code"]
+    SYNC -->|"per project"| P7["🤖  Antigravity / Verdent"]
+
+    SYNC -->|"--global → ~/ paths"| G1["🌐  global tool dirs"]
 ```
 
-Edit once in Obsidian, run `skill sync`, and every tool picks up the change on next reload — no copy-paste, no duplication.
+Edit once in Obsidian, run `skill sync`, and every tool picks up the change on next reload — no copy-paste, no duplication. All 9 formats work per-project; `--global` writes instead to the tool's home-directory path.
 
 ---
 
@@ -72,7 +79,7 @@ Edit once in Obsidian, run `skill sync`, and every tool picks up the change on n
 
 | Portable | Testable | Versioned |
 |---|---|---|
-| 7 tool formats + 4 LLM adapters, same `.md` file | `skill validate` + `skill diff` + Py↔TS parity test in CI | `version:` in frontmatter, skills live in git |
+| 9 tool formats + 4 LLM adapters, same `.md` file | `skill validate` + `skill diff` + Py↔TS parity test in CI | `version:` in frontmatter, skills live in git |
 
 ---
 
@@ -126,13 +133,15 @@ skill sync --global
 
 This writes skills to:
 
-| Tool | Location |
+| Tool | Global location (`--global`) |
 |---|---|
 | Claude Code | `~/.claude/skills/` |
 | Verdent | `~/.claude/skills/` |
 | Antigravity | `~/.gemini/antigravity/skills/` |
 | Cursor | `~/.cursor/rules/` |
 | VS Code Copilot | `~/.vscode/instructions/` |
+| Windsurf | `~/.windsurf/rules/` |
+| Roo Code | `~/.roo/rules/` |
 | TRAE | `~/.trae/rules/` |
 | OpenCode | `~/.opencode/` |
 
@@ -146,10 +155,11 @@ Restart your tool. Every skill is live immediately with the auth you already hav
 cd my-project
 skill init
 # Skills directory [/path/to/universal-skills/skills]:  <- remembered from Step 1
-# Formats (cursor, vscode, trae, opencode) [cursor,vscode,trae,opencode]:
+# Formats (cursor, vscode, opencode, trae, windsurf, roo, claude, antigravity, verdent) [cursor,vscode,...]:
 ```
 
 The skills path is pre-filled from `~/.usf.json` — just press Enter twice.
+All 9 formats are available per-project; pick only the tools your team uses.
 Creates `.usf.json`. Commit it so teammates get the same setup automatically.
 
 ---
@@ -191,6 +201,8 @@ skill export code-reviewer --format claude        # -> ~/.claude/skills/
 skill export code-reviewer --format antigravity   # -> ~/.gemini/antigravity/skills/
 skill export code-reviewer --format cursor        # -> ~/.cursor/rules/
 skill export code-reviewer --format vscode        # -> ~/.vscode/instructions/
+skill export code-reviewer --format windsurf      # -> ~/.windsurf/rules/
+skill export code-reviewer --format roo           # -> ~/.roo/rules[-<mode>]/
 skill export code-reviewer --format opencode      # -> ~/.opencode/
 skill export code-reviewer --format trae          # -> ~/.trae/rules/
 skill export code-reviewer --all                  # every format at once
@@ -361,7 +373,7 @@ skill sync                                    # re-export all skills to configur
 skill sync --global                           # also sync to Claude Code, Antigravity, Verdent
 ```
 
-Supported `--format` values: `claude`, `cursor`, `vscode`, `opencode`, `trae`, `antigravity`, `verdent`.
+Supported `--format` values: `claude`, `antigravity`, `verdent`, `cursor`, `vscode`, `windsurf`, `roo`, `opencode`, `trae`.
 
 ---
 
@@ -399,7 +411,7 @@ typed inputs, and multi-provider adapters on top. Full mapping in
 |-----------------------|-------------------------------|--------------------|--------------------|
 | Unit                  | A versioned markdown file     | Python object      | A class / chain    |
 | LLM providers         | 4 adapters, same file         | Depends            | Depends            |
-| Tool formats          | 7 (claude, cursor, vscode...) | -                  | -                  |
+| Tool formats          | 9 (claude, cursor, windsurf, roo...) | -             | -                  |
 | Claude Skills export  | yes                           | no                 | no                 |
 | Declared inputs       | typed                         | partial            | yes                |
 | Structured sections   | required                      | no                 | no                 |

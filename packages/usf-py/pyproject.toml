@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "usf-skills"
-version = "0.1.1"
+version = "0.1.2"
 description = "One skills folder, every AI coding tool. Write prompts once, sync to Cursor, VS Code, Claude Code and more."
 readme = "README.md"
 license = { text = "MIT" }

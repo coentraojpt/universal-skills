@@ -156,6 +156,43 @@ def export_trae(skill: Skill, out_dir: Path) -> Path:
     return out
 
 
+# ── Windsurf ──────────────────────────────────────────────────────────────────
+
+def export_windsurf(skill: Skill, out_dir: Path) -> Path:
+    """Windsurf: <project>/.windsurf/rules/<name>.md"""
+    rules_dir = out_dir / ".windsurf" / "rules"
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    out = rules_dir / f"{skill.name}.md"
+    description = str(skill.frontmatter.get("description", ""))
+    tags = skill.frontmatter.get("tags", [])
+    globs = _tags_to_globs(tags)
+    fm_lines = ["---", "trigger: manual", f"description: {json.dumps(description)}"]
+    if globs:
+        fm_lines.append(f"glob: {json.dumps(globs[0])}")
+    fm_lines.append("---\n")
+    content = "\n".join(fm_lines) + "\n" + _skill_body(skill)
+    out.write_text(content, encoding="utf-8")
+    return out
+
+
+# ── Roo Code ──────────────────────────────────────────────────────────────────
+
+_ROO_MODES = {"code", "architect", "ask", "debug", "test"}
+
+
+def export_roo(skill: Skill, out_dir: Path) -> Path:
+    """Roo Code: <project>/.roo/rules[-<mode>]/<name>.md"""
+    tags = skill.frontmatter.get("tags", []) or []
+    mode = next((t for t in tags if t in _ROO_MODES), None)
+    subdir = f"rules-{mode}" if mode else "rules"
+    rules_dir = out_dir / ".roo" / subdir
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    out = rules_dir / f"{skill.name}.md"
+    header = f"# {skill.frontmatter.get('name', skill.name)}\n{skill.frontmatter.get('description', '')}\n\n"
+    out.write_text(header + _skill_body(skill), encoding="utf-8")
+    return out
+
+
 # ── Registry ──────────────────────────────────────────────────────────────────
 
 EXPORTERS: dict[str, Callable[[Skill, Path], Path]] = {
@@ -166,6 +203,8 @@ EXPORTERS: dict[str, Callable[[Skill, Path], Path]] = {
     "vscode": export_vscode,
     "opencode": export_opencode,
     "trae": export_trae,
+    "windsurf": export_windsurf,
+    "roo": export_roo,
 }
 
 # Global paths per format — used when --global is passed to skill sync/export
@@ -177,4 +216,14 @@ GLOBAL_DEFAULTS: dict[str, Path] = {
     "vscode": Path.home() / ".vscode" / "instructions",
     "trae": Path.home() / ".trae" / "rules",
     "opencode": Path.home() / ".opencode",
+    "windsurf": Path.home() / ".windsurf" / "rules",
+    "roo": Path.home() / ".roo" / "rules",
+}
+
+# Project-level subdirectories for formats whose exporter expects a pre-resolved
+# base path (i.e. does not create its own subdirectory relative to project root).
+PROJECT_OUT_DIRS: dict[str, str] = {
+    "claude": ".claude/skills",
+    "antigravity": ".gemini/antigravity/skills",
+    "verdent": ".claude/skills",
 }
