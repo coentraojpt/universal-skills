@@ -5,7 +5,7 @@ Python implementation of the Universal Skills Framework — turn prompts into po
 Install:
 
 ```
-pip install universal-skills
+pip install usf-skills
 ```
 
 Use the `skill` CLI:
